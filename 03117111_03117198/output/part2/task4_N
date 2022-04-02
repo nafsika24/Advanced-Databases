@@ -1,0 +1,39 @@
++----+---------------+---+----+---+----------+
+| _c0|            _c1|_c0| _c1|_c2|       _c3|
++----+---------------+---+----+---+----------+
+|   5|         Comedy|  2|   5|3.0| 867039249|
+|   5|          Crime|  2|   5|3.0| 867039249|
+|1408|      Adventure| 15|1408|5.0|1346008714|
+|1408|         Action| 15|1408|5.0|1346008714|
+| 524|          Crime| 24| 524|2.0| 979870484|
+| 524|          Drama| 24| 524|2.0| 979870484|
+|1408|      Adventure| 24|1408|3.0| 979870731|
+|1408|         Action| 24|1408|3.0| 979870731|
+| 902|      Adventure| 36| 902|2.0| 965349039|
+| 902|Science Fiction| 36| 902|2.0| 965349039|
+| 902|        Fantasy| 36| 902|2.0| 965349039|
+|   5|         Comedy| 40|   5|4.0| 862515493|
+|   5|          Crime| 40|   5|4.0| 862515493|
+| 902|      Adventure| 41| 902|4.0|1445255341|
+| 902|Science Fiction| 41| 902|4.0|1445255341|
+| 902|        Fantasy| 41| 902|4.0|1445255341|
+| 524|          Crime| 43| 524|2.5|1179200291|
+| 524|          Drama| 43| 524|2.5|1179200291|
+| 902|      Adventure| 43| 902|4.5|1179197971|
+| 902|Science Fiction| 43| 902|4.5|1179197971|
++----+---------------+---+----+---+----------+
+only showing top 20 rows
+
+== Physical Plan ==
+*(3) BroadcastHashJoin [_c0#8], [_c1#1], Inner, BuildLeft
+:- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)))
+:  +- *(2) Filter isnotnull(_c0#8)
+:     +- *(2) GlobalLimit 100
+:        +- Exchange SinglePartition
+:           +- *(1) LocalLimit 100
+:              +- *(1) FileScan parquet [_c0#8,_c1#9] Batched: true, Format: Parquet, Location: InMemoryFileIndex[hdfs://master:9000/files/movie_genres.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<_c0:int,_c1:string>
++- *(3) Project [_c0#0, _c1#1, _c2#2, _c3#3]
+   +- *(3) Filter isnotnull(_c1#1)
+      +- *(3) FileScan parquet [_c0#0,_c1#1,_c2#2,_c3#3] Batched: true, Format: Parquet, Location: InMemoryFileIndex[hdfs://master:9000/files/ratings.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(_c1)], ReadSchema: struct<_c0:int,_c1:int,_c2:double,_c3:int>
+Time with choosing join type enabled` is 14.7016 sec.
+
